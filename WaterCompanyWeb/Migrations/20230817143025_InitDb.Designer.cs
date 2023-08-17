@@ -9,7 +9,7 @@ using WaterCompanyWeb.Data;
 namespace WaterCompanyWeb.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230816194740_InitDb")]
+    [Migration("20230817143025_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,8 +29,7 @@ namespace WaterCompanyWeb.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientName")
                         .IsRequired()

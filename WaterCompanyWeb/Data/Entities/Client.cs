@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
 
 namespace WaterCompanyWeb.Data.Entities
 {
-    public class Client
+    public class Client : IEntity
     {
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(50, ErrorMessage = "The field {0} only can contain {1} characters lenght.")]
+        [MaxLength(50, ErrorMessage = "The field {0} can only contain {1} characters lenght.")]
         [Display(Name = "Client Name")]
         public string ClientName { get; set; }
 
@@ -21,7 +20,6 @@ namespace WaterCompanyWeb.Data.Entities
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(100, ErrorMessage = "The field {0} only can contain {1} characters lenght.")]
         public string Address { get; set; }
 
         [Required]
@@ -35,6 +33,7 @@ namespace WaterCompanyWeb.Data.Entities
         [Display(Name = "Tax identification number")]
         public string NIF { get; set; }
 
+        [Required]
         [Display(Name = "Is Available")]
         public bool IsAvailable { get; set; }
     }

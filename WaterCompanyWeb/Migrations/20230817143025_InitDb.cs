@@ -15,7 +15,7 @@ namespace WaterCompanyWeb.Migrations
                     ClientName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: false)

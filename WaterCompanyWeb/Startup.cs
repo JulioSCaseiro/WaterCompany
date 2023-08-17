@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WaterCompanyWeb.Data;
 
 namespace WaterCompanyWeb
@@ -29,6 +24,7 @@ namespace WaterCompanyWeb
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IClientRepository, ClientRepository>();
             services.AddControllersWithViews();
             services.AddTransient<SeedDb>();
         }
@@ -52,6 +48,7 @@ namespace WaterCompanyWeb
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {
