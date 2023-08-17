@@ -11,8 +11,8 @@ namespace WaterCompanyWeb.Data.Entities
         [Display(Name = "Client Name")]
         public string ClientName { get; set; }
 
-        [MinLength(9, ErrorMessage = "Not a valide phone number!")]
-        [MaxLength(9, ErrorMessage = "Not a valide phone number!")]
+        [MinLength(9, ErrorMessage = "Incorrect phone number. (Number too short)")]
+        [MaxLength(9, ErrorMessage = "Incorrect phone number. (Number too big)")]
         public string Phone { get; set; }
 
         [Required]
@@ -23,8 +23,8 @@ namespace WaterCompanyWeb.Data.Entities
         public string Address { get; set; }
 
         [Required]
-        [RegularExpression(@"^\d{4}(-\d{3})?$", ErrorMessage = "Invalid Postal Code!")]
-        [Display(Name = "Postal Code")]
+        [RegularExpression(@"^\d{4}(-\d{3})?$", ErrorMessage = "Invalid Zip code!")]
+        [Display(Name = "Zip code")]
         public string PostalCode { get; set; }
 
         [Required]
@@ -34,7 +34,9 @@ namespace WaterCompanyWeb.Data.Entities
         public string NIF { get; set; }
 
         [Required]
-        [Display(Name = "Is Available")]
+        [Display(Name = "Available")]
         public bool IsAvailable { get; set; }
+
+        public User User { get; set; }
     }
 }
