@@ -1,4 +1,4 @@
-﻿@model WaterCompanyWeb.Data.Entities.Client
+﻿@model WaterCompanyWeb.Models.ClientViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -7,9 +7,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageUrl" />
             <div class="form-group">
                 <label asp-for="ClientName" class="control-label"></label>
                 <input asp-for="ClientName" class="form-control" />
@@ -40,6 +41,11 @@
                 <input asp-for="NIF" class="form-control" />
                 <span asp-validation-for="NIF" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" placeholder="" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
@@ -50,6 +56,12 @@
             </div>
         </form>
     </div>
+</div>
+<div class="form-group">
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width: auto; height: 100px;" />
+    }
 </div>
 
 <div>
