@@ -8,6 +8,8 @@ namespace WaterCompanyWeb.Data
     {
         public DbSet<Client> Clients { get; set; }
 
+        public DbSet<WaterMeter> WaterMeter { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     }
 }

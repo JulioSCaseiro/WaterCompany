@@ -49,7 +49,7 @@ namespace WaterCompanyWeb.Data.Entities
         }
 
         [Required]
-        [Display(Name = "Available")]
+        [Display(Name = "Active")]
         public bool IsAvailable { get; set; }
 
         public User User { get; set; }

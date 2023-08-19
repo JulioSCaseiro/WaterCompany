@@ -63,7 +63,7 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <a asp-action="Delete" asp-for="Id" class="btn"><i class="fas fa-trash-alt fa-lg" style="color: #9A8174;"></i> Delete</a> @*DELETE BUTTON*@
+        <button action="Delete" asp-for="Id" class="btn"><i class="fas fa-trash-alt fa-lg" style="color: #9A8174;"></i> Delete</button> @*DELETE BUTTON*@
         <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Return</a> @*RETURN BUTTON*@
     </form>
 </div>

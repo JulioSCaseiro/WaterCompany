@@ -51,26 +51,21 @@
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
                 </label>
             </div>
-            
+            <div class="form-group">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width: auto; height: 400px;" />
+                }
+            </div>
+            <div>
+                <button asp-action="Edit" asp-for="Id" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
+                <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
+            </div>
         </form>
     </div>
 </div>
-<div class="form-group">
-    @if (!string.IsNullOrEmpty(Model.ImageUrl))
-    {
-        <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width: auto; height: 100px;" />
-    }
-</div>
 
-<div class="form-group">
-    <button type="submit" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
 
-    <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
-</div>
-
-<div>
-    
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -1,0 +1,45 @@
+﻿@model WaterCompanyWeb.Data.Entities.WaterMeter
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Rank" class="control-label"></label>
+                <input asp-for="Rank" class="form-control" />
+                <span asp-validation-for="Rank" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConsumptionDate" class="control-label"></label>
+                <input asp-for="ConsumptionDate" class="form-control" />
+                <span asp-validation-for="ConsumptionDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Value" class="control-label"></label>
+                <input asp-for="Value" class="form-control" />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalConsumption" class="control-label"></label>
+                <input asp-for="TotalConsumption" class="form-control" />
+                <span asp-validation-for="TotalConsumption" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button asp-action="Edit" asp-for="Id" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
+                <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
