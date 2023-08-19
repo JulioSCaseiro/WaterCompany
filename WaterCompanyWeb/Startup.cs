@@ -39,10 +39,13 @@ namespace WaterCompanyWeb
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
-            services.AddScoped<IClientRepository, ClientRepository>();
+
             services.AddControllersWithViews();
             services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IImageHelper, ImageHelper>();
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+            services.AddScoped<IClientRepository, ClientRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

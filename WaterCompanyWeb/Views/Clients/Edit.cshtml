@@ -51,9 +51,7 @@
                     <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
                 </label>
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i></button> @*SAVE BUTTON*@
-            </div>
+            
         </form>
     </div>
 </div>
@@ -64,8 +62,14 @@
     }
 </div>
 
+<div class="form-group">
+    <button type="submit" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
+
+    <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
+</div>
+
 <div>
-    <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i></a> @*BACK BUTTON*@
+    
 </div>
 
 @section Scripts {
