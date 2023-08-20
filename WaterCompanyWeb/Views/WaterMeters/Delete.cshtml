@@ -8,30 +8,7 @@
 <div>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rank)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rank)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ConsumptionDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ConsumptionDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Value)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Value)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalConsumption)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TotalConsumption)
-        </dd>
+        <partial name="_WaterMetersDeleteDetails" />
     </dl>
     
     <form asp-action="Delete">

@@ -1,0 +1,51 @@
+﻿@model WaterCompanyWeb.Data.Entities.Client
+
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.ClientName)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.ClientName)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Phone)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Phone)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Email)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Email)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Address)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Address)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.PostalCode)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.PostalCode)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.NIF)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.NIF)
+</dd>
+
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.IsAvailable)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.IsAvailable)
+</dd>
+<dd class="col-9">
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width: auto; height: 450px;" />
+    }
+</dd>
