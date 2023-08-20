@@ -23,14 +23,28 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Clients" asp-action="Index">Clients</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="WaterMeters" asp-action="Index">Water Meters</a>
                         </li>
+                    </ul>
+                    <ul class="navbar-nav navbar-right">
+                        @if (this.User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                            <a class="btn" asp-area="" asp-controller="Home" asp-action="Index"> @this.User.Identity.Name</a>
+                            </li>
+                            <li class="nav-item">
+                            <a class="btn" asp-area="" asp-controller="Account" asp-action="Logout"> Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn" asp-area="" asp-controller="Account" asp-action="Login"><i class="fa-solid fa-user fa-lg"></i> Account</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -44,7 +58,8 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            CINEL CET76 Júlio Caseiro | UFCD 5417 - Programação para a WEB-servidor (server-side)
+            CINEL CET76 Júlio Caseiro | UFCD 5417 - Programação para a WEB-servidor (server-side) | 
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

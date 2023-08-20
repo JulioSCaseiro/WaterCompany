@@ -8,6 +8,7 @@ using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
 using WaterCompanyWeb.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WaterCompanyWeb.Controllers
 {
@@ -54,6 +55,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -75,7 +77,7 @@ namespace WaterCompanyWeb.Controllers
                 }
                 var client = _converterHelper.ToClient(model, path, true);
 
-                client.User = await _userHelper.GetUserByEmailAsync("caseiroinc@gmail.com");
+                client.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _clientRepository.CreateAsync(client);
                 return RedirectToAction(nameof(Index));
             }
@@ -83,6 +85,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -120,8 +123,7 @@ namespace WaterCompanyWeb.Controllers
 
                     var client = _converterHelper.ToClient(model, path, false);
 
-                    //TODO: Modificar para o user que tiver logado
-                    client.User = await _userHelper.GetUserByEmailAsync("caseiroinc@gmail.com");
+                    client.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                     await _clientRepository.UpdateAsync(client);
                 }
                 catch (DbUpdateConcurrencyException)
@@ -141,6 +143,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
