@@ -24,6 +24,10 @@ namespace WaterCompanyWeb.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
+            await _userHelper.CheckRoleAsync("Admin");
+            await _userHelper.CheckRoleAsync("Staff");
+            await _userHelper.CheckRoleAsync("Client");
+
             var user = await _userHelper.GetUserByEmailAsync("caseiroinc@gmail.com");
             if (user == null)
             {
@@ -42,8 +46,18 @@ namespace WaterCompanyWeb.Data
                 {
                     throw new InvalidOperationException("Couldn't create user in seedDB!");
                 }
+
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
-                if (!_context.Clients.Any())
+
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+
+            if (!_context.Clients.Any())
             {
                 AddClient("Jorge Manuel", user);
                 AddClient("Pedro Teixeira", user);
