@@ -43,13 +43,13 @@ namespace WaterCompanyWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
 
             var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
 
             return View(client);
@@ -93,13 +93,13 @@ namespace WaterCompanyWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
 
             var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
             var model = _converterHelper.ToClientViewModel(client);
             return View(model);
@@ -134,7 +134,7 @@ namespace WaterCompanyWeb.Controllers
                 {
                     if (!await _clientRepository.ExistAsync(model.Id))
                     {
-                        return NotFound();
+                        new NotFoundViewResult("ClientNotFound");
                     }
                     else
                     {
@@ -152,13 +152,13 @@ namespace WaterCompanyWeb.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
 
             var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ClientNotFound");
             }
 
             return View(client);
@@ -173,6 +173,11 @@ namespace WaterCompanyWeb.Controllers
             var client = await _clientRepository.GetByIdAsync(id);
             await _clientRepository.DeleteAsync(client);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult ClientNotFound()
+        {
+            return View();
         }
     }
 }
