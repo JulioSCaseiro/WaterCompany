@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
@@ -13,10 +18,13 @@ namespace WaterCompanyWeb.Controllers
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(IUserHelper userHelper)
+        public AccountController(IUserHelper userHelper,
+            IConfiguration configuration)
         {
             _userHelper = userHelper;
+            _configuration = configuration;
         }
 
         public IActionResult Login()
@@ -176,5 +184,47 @@ namespace WaterCompanyWeb.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Username); // email verification
+                if (user != null) // = in case email exists
+                {
+                    var result = await _userHelper.ValidatePasswordAsync(
+                        user,
+                        model.Password);
+
+                    if (result.Succeeded) // check if the password is valid
+                    {
+                        var claims = new[] // where the program starts building the token
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, user.Email), // internal mechanism that creates an area where the user email will be registered
+                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // creates a random guid associated with the user email
+                        }; // we can know the full proccess of the build that took place
+
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"])); // gets the key written by the dev at "appsettings.json" and converts to bytes
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); // generates credentials and the token, using the algorithm HmacSha256(most used algorithm)
+                        var token = new JwtSecurityToken(
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(15), // token valid for 15 days (can change for what the app owner wants)
+                            signingCredentials: credentials);
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo
+                        };
+                        return this.Created(string.Empty, results); // the first parameter is always empty since we don't want to send anything but the object.
+                    }
+                }
+            }
+
+            return BadRequest(); // if it goes wrong
+        }
+
     }
 }
