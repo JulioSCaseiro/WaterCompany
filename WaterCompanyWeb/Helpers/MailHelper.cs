@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MailKit.Net.Smtp;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 using System;
-using System.Threading.Tasks;
-using MailKit.Net.Smtp;
 
 namespace WaterCompanyWeb.Helpers
 {
@@ -27,7 +26,7 @@ namespace WaterCompanyWeb.Helpers
             message.To.Add(new MailboxAddress(to, to));
             message.Subject = subject;
 
-            var bodybuilder = new BodyBuilder
+            var bodybuilder = new BodyBuilder()
             {
                 HtmlBody = body,
             };
@@ -50,6 +49,7 @@ namespace WaterCompanyWeb.Helpers
                     IsSuccess = false,
                     Message = ex.ToString()
                 };
+
             }
 
             return new Response

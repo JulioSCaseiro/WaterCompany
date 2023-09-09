@@ -31,5 +31,13 @@ namespace WaterCompanyWeb.Models
         [Display(Name = "Confirm Password")]
         [Compare("Password")]
         public string Confirm { get; set; }
+
+        [Required]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber{ get; set; }
+
+        //[Required(ErrorMessage = "Role is required")]
+        //[Display(Name = "Role")]
+        //public string SelectedRole { get; set; }
     }
 }

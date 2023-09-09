@@ -1,4 +1,6 @@
-﻿namespace WaterCompanyWeb.Helpers
+﻿using System.Threading.Tasks;
+
+namespace WaterCompanyWeb.Helpers
 {
     public interface IMailHelper
     {

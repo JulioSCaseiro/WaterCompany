@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -20,14 +22,21 @@ namespace WaterCompanyWeb.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IMailHelper _mailHelper;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<User> _userManager;
 
         public AccountController(IUserHelper userHelper,
             IMailHelper mailHelper,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<User> userManager
+            )
         {
             _userHelper = userHelper;
             _mailHelper = mailHelper;
             _configuration = configuration;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
         public IActionResult Login()
@@ -64,13 +73,11 @@ namespace WaterCompanyWeb.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Register()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
@@ -83,8 +90,9 @@ namespace WaterCompanyWeb.Controllers
                     {
                         FirstName = model.FirstName,
                         LastName = model.FirstName,
+                        Email = model.Username,
                         UserName = model.Username,
-                        Email = model.Email
+                        PhoneNumber = model.PhoneNumber
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
@@ -93,26 +101,29 @@ namespace WaterCompanyWeb.Controllers
                         ModelState.AddModelError(string.Empty, "The user couldn't be created.");
                         return View(model);
                     }
+                }
+               
+                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                {
+                    userid = user.Id,
+                    token = myToken
+                }, protocol: HttpContext.Request.Scheme);
 
-                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                    {
-                        userid = user.Id,
-                        token = myToken
-                    }, protocol: HttpContext.Request.Scheme);
+                Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                    $"Your access Email is: {user.UserName}. \n" +
+                    $"To be able to use the Water Company website, " +
+                    $"plase click in this link to confirm your email and " +
+                    $"proceed to change your password:</br></br><a href = \"{tokenLink}\"><b>Confirm Email</b></a>");
 
-                    Response response = _mailHelper.SendEmail(model.Email, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                        $"To allow the user, " +
-                        $"plase click in this link:</br></br><a href = \"{tokenLink}\"><b>Confirm Email</b></a>");
-
-
-                    if (response.IsSuccess)
-                    {
-                        ViewBag.Message = "The instructions have been sent through email to your new user";
-                        return View(model);
-                    }
-
-                    ModelState.AddModelError(string.Empty, "The user couldn't be logged.");
+                if (response.IsSuccess)
+                {
+                    ViewBag.Message = "The instructions have been sent through email to your new user";
+                    return View(model);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "The email couldn't be sent.");
                 }
             }
 
@@ -214,21 +225,80 @@ namespace WaterCompanyWeb.Controllers
             return View();
         }
 
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "The email doesn't correspont to a registered user.");
+                    return View(model);
+                }
+
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                var link = this.Url.Action(
+                    "ResetPassword",
+                    "Account",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+                Response response = _mailHelper.SendEmail(model.Email, "WaterCompany Password Reset", $"<h1>WaterCompany Password Reset</h1>" +
+                $"To reset the password click in this link:</br></br>" +
+                $"<a href = \"{link}\">Reset Password</a>");
+
+                if (response.IsSuccess)
+                {
+                    this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
+                }
+                return this.View();
+            }
+            return this.View(model);
+        }
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.UserName);
+            if (user != null)
+            {
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+                if (result.Succeeded)
+                {
+                    this.ViewBag.Message = "Password reset successful.";
+                    return View();
+                }
+                this.ViewBag.Message = "Error while resetting the password.";
+                return View(model);
+            }
+            this.ViewBag.Message = "User not found.";
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
         {
             if (this.ModelState.IsValid)
             {
-                var user = await _userHelper.GetUserByEmailAsync(model.Username); // email verification
-                if (user != null) // = in case email exists
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
+                if (user != null)
                 {
                     var result = await _userHelper.ValidatePasswordAsync(
                         user,
                         model.Password);
 
-                    if (result.Succeeded) // check if the password is valid
+                    if (result.Succeeded)
                     {
-                        var claims = new[] // where the program starts building the token
+                        var claims = new[]
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, user.Email), // internal mechanism that creates an area where the user email will be registered
                             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // creates a random guid associated with the user email

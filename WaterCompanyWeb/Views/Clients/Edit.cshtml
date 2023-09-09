@@ -21,6 +21,10 @@
             <div>
                 <button asp-action="Edit" asp-for="Id" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
                 <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
+                @if (this.User.IsInRole("Client"))
+                {
+                    <a asp-action="ChangePassword" asp-controller="Account" class="btn btn-outline-success"><i class="fa-solid fa-key fa-lg" style="color: #9A8174;"></i> Change Password</a> @*CHANGE PW BUTTON*@
+                }
             </div>
         </form>
     </div>

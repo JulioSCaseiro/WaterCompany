@@ -28,15 +28,15 @@ namespace WaterCompanyWeb.Data
             await _userHelper.CheckRoleAsync("Staff");
             await _userHelper.CheckRoleAsync("Client");
 
-            var user = await _userHelper.GetUserByEmailAsync("caseiroinc@gmail.com");
+            var user = await _userHelper.GetUserByEmailAsync("watercompanyjulio@gmail.com");
             if (user == null)
             {
                 user = new User
                 {
                     FirstName = "Júlio",
                     LastName = "Caseiro",
-                    Email = "caseiroinc@gmail.com",
-                    UserName = "caseiroinc@gmail.com",
+                    Email = "watercompanyjulio@gmail.com",
+                    UserName = "watercompanyjulio@gmail.com",
                     PhoneNumber = "911789217"
                 };
 

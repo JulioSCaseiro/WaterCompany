@@ -3,10 +3,11 @@
     ViewData["Title"] = "ConfirmEmail";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>Confirm Email</h2>
 <div>
     <p>
-        Thank you for confirming your email. You can now login into your account.
+        Thank you for confirming your email. Please click the link below to create a password to be able to access the website.
+        <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="RecoverPassword">Recover Password</a>
     </p>
 </div>
 
