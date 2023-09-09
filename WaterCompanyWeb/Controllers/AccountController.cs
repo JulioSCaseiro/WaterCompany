@@ -130,6 +130,40 @@ namespace WaterCompanyWeb.Controllers
             return View(model);
         }
 
+        public IActionResult RegisterRequest()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterRequest(RegisterRequestViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Response response = _mailHelper.SendEmail("watercompanyjulio@gmail.com", "Account Register Request", $"<h1>Account Register Request</h1>" +
+                    $"New request from a client to create an account with the following information: \n" +
+                    $"First Name: {model.FirstName}, \n" +
+                    $"Last Name: {model.LastName}, \n" +
+                    $"Phone number: {model.PhoneNumber}, \n" +
+                    $"Username: {model.Username}, \n" +
+                    $"Email: {model.Email}, \n" +
+                    $"<b>Create the following client with the information given.</b></a>");
+
+                if (response.IsSuccess)
+                {
+                    ViewBag.Message = "Your information has been sent to the site admin. Please kindly wait for further instructions.";
+                    return View(model);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "The request failed. Please try again. If the problem proceeds, get in touch with our support.");
+                }
+            }
+
+            return View(model);
+        }
+
+
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);

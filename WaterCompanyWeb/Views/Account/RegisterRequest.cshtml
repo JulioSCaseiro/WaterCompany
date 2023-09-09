@@ -1,10 +1,9 @@
-﻿@model WaterCompanyWeb.Models.RegisterNewUserViewModel
+﻿@model WaterCompanyWeb.Models.RegisterRequestViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "RegisterRequest";
 }
 
-<h3>Register</h3>
-
+<label>In order to register, please add your information down below so a admin can create your account</label>
 <div class="row">
     <div class="col-md-4 offset-md-4">
         <form method="post">
@@ -35,31 +34,13 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Password">Password</label>
-                <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-warning"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Confirm">Confirm Password</label>
-                <input asp-for="Confirm" type="password" class="form-control" />
-                <span asp-validation-for="Confirm" class="text-warning"></span>
-            </div>
-
-            <div class="form-group">
                 <label asp-for="PhoneNumber">Phone Number</label>
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-warning"></span>
             </div>
 
-            @*<div class="form-group">
-                @Html.LabelFor(model => model.SelectedRole)
-                @Html.DropDownListFor(model => model.SelectedRole, (SelectList)ViewBag.Roles, "Select a role", new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.SelectedRole, "", new { @class = "text-warning" })
-            </div>*@
-
             <div class="form-group">
-                <input type="submit" value="Register New User" class="btn btn-primary" />
+                <input type="submit" value="Create Request" class="btn btn-primary" />
             </div>
         </form>
     </div>
