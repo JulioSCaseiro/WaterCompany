@@ -10,6 +10,8 @@ namespace WaterCompanyWeb.Helpers
     {
         Task<User> GetUserByEmailAsync(string email);
 
+        Task<List<User>> GetAllUsersAsync();
+
         Task<IdentityResult> AddUserAsync(User user, string password);
 
         Task<SignInResult> LoginAsync(LoginViewModel model);
@@ -37,7 +39,5 @@ namespace WaterCompanyWeb.Helpers
         Task<string> GeneratePasswordResetTokenAsync(User user);
 
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
-
-        //Task<List<User>> GetAllUsersAsync();
     }
 }

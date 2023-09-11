@@ -36,8 +36,8 @@ namespace WaterCompanyWeb.Models
         [Display(Name = "Phone Number")]
         public string PhoneNumber{ get; set; }
 
-        //[Required(ErrorMessage = "Role is required")]
-        //[Display(Name = "Role")]
-        //public string SelectedRole { get; set; }
+        [Required(ErrorMessage = "Role is required")]
+        [Display(Name = "Role")]
+        public string SelectedRole { get; set; }
     }
 }

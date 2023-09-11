@@ -7,67 +7,67 @@
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly"></div>
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+        @*<form method="post">*@
+            @*<div asp-validation-summary="ModelOnly"></div>*@
 
             <div class="form-group">
-                <label asp-for="FirstName">First Name</label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-warning"></span>
+                    @Html.LabelFor(model => model.FirstName)
+                    @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="LastName">Last Name</label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-warning"></span>
+                    @Html.LabelFor(model => model.LastName)
+                    @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="Username">Email</label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-warning"></span>
+                @Html.LabelFor(model => model.PhoneNumber)
+                @Html.TextBoxFor(model => model.PhoneNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="Email">Confirm Email</label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-warning"></span>
+                    @Html.LabelFor(model => model.Username)
+                    @Html.TextBoxFor(model => model.Username, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="Password">Password</label>
-                <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-warning"></span>
+                    @Html.LabelFor(model => model.Email)
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="Confirm">Confirm Password</label>
-                <input asp-for="Confirm" type="password" class="form-control" />
-                <span asp-validation-for="Confirm" class="text-warning"></span>
+                    @Html.LabelFor(model => model.Password)
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-warning" })
             </div>
 
             <div class="form-group">
-                <label asp-for="PhoneNumber">Phone Number</label>
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-warning"></span>
+                    @Html.LabelFor(model => model.Confirm)
+                    @Html.PasswordFor(model => model.Confirm, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Confirm, "", new { @class = "text-warning" })
             </div>
 
-            @*<div class="form-group">
+            <div class="form-group">
                 @Html.LabelFor(model => model.SelectedRole)
                 @Html.DropDownListFor(model => model.SelectedRole, (SelectList)ViewBag.Roles, "Select a role", new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.SelectedRole, "", new { @class = "text-warning" })
-            </div>*@
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Register New User" class="btn btn-primary" />
             </div>
-        </form>
+        @*</form>*@
+        }
     </div>
-</div>
-<div class="text-success">
-    <p>
-        @ViewBag.Message
-    </p>
 </div>
 
 @section Scripts {

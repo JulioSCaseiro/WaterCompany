@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -53,16 +54,25 @@ namespace WaterCompanyWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _userHelper.LoginAsync(model);
-                if (result.Succeeded)
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+                if (user != null && await _userManager.IsInRoleAsync(user, "Admin") ||
+                                    await _userManager.IsInRoleAsync(user, "Staff") ||
+                                    await _userManager.IsInRoleAsync(user, "Client"))
                 {
-                    if (this.Request.Query.Keys.Contains("ReturnUrl"))
+                    var result = await _userHelper.LoginAsync(model);
+                    if (result.Succeeded)
                     {
-                        return Redirect(this.Request.Query["ReturnUrl"].First());
+                        if (this.Request.Query.Keys.Contains("ReturnUrl"))
+                        {
+                            return Redirect(this.Request.Query["ReturnUrl"].First());
+                        }
+
+                        return RedirectToAction("Index", "Home");
                     }
-                    return RedirectToAction("Index", "Home");
                 }
             }
+
             this.ModelState.AddModelError(string.Empty, "Failed to login");
             return View(model);
         }
@@ -73,11 +83,16 @@ namespace WaterCompanyWeb.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [RoleAuthorization("Admin")]
         public IActionResult Register()
         {
+            var role = _roleManager.Roles.ToList();
+            ViewBag.Roles = new SelectList(role);
             return View();
         }
 
+        [RoleAuthorization("Admin")]
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model)
         {
@@ -101,8 +116,19 @@ namespace WaterCompanyWeb.Controllers
                         ModelState.AddModelError(string.Empty, "The user couldn't be created.");
                         return View(model);
                     }
+
+                    // Add the user to the role
+                    if (model.SelectedRole == "Client")
+                    {
+                        await _userHelper.AddUserToRoleAsync(user, "Client");
+                    }
+                    else
+                    {
+                        await _userHelper.AddUserToRoleAsync(user, "Staff");
+                    }
+
                 }
-               
+
                 string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
                 string tokenLink = Url.Action("ConfirmEmail", "Account", new
                 {
@@ -126,7 +152,6 @@ namespace WaterCompanyWeb.Controllers
                     ModelState.AddModelError(string.Empty, "The email couldn't be sent.");
                 }
             }
-
             return View(model);
         }
 
@@ -142,8 +167,8 @@ namespace WaterCompanyWeb.Controllers
             {
                 Response response = _mailHelper.SendEmail("watercompanyjulio@gmail.com", "Account Register Request", $"<h1>Account Register Request</h1>" +
                     $"New request from a client to create an account with the following information: \n" +
-                    $"First Name: {model.FirstName}, \n" +
-                    $"Last Name: {model.LastName}, \n" +
+                    $"<a>First Name: {model.FirstName}, </a>" +
+                    $"<a>Last Name: {model.LastName}, </a>" +
                     $"Phone number: {model.PhoneNumber}, \n" +
                     $"Username: {model.Username}, \n" +
                     $"Email: {model.Email}, \n" +
@@ -163,7 +188,36 @@ namespace WaterCompanyWeb.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> UserList()
+        {
+            var users = await _userHelper.GetAllUsersAsync();
 
+            // Create a URL that includes the current URL as a query parameter
+            var currentUrl = Url.Action("UserList", "Account", null, Request.Scheme);
+
+            // Get all roles to be used in the view
+            var allRoles = await _roleManager.Roles.ToListAsync();
+
+            var usersWithRoles = new List<UserWithRolesViewModel>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // Map roles to their names and filter out empty names
+                var roleNames = roles.Select(role => allRoles.FirstOrDefault(r => r.Name == role)?.Name)
+                                     .Where(name => !string.IsNullOrEmpty(name))
+                                     .ToList();
+
+                usersWithRoles.Add(new UserWithRolesViewModel
+                {
+                    User = user,
+                    Roles = roleNames,
+                    UserListUrl = currentUrl // Pass the URL to the view model
+                });
+            }
+
+            return View(usersWithRoles);
+        }
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);

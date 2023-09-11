@@ -67,10 +67,10 @@ namespace WaterCompanyWeb.Helpers
             return await _userManager.GeneratePasswordResetTokenAsync(user);
         }
 
-        //public async Task<List<User>> GetAllUsersAsync()
-        //{
-        //    return await Task.FromResult(_userManager.Users.ToList());
-        //}
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            return await Task.FromResult(_userManager.Users.ToList());
+        }
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
