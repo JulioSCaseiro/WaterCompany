@@ -40,7 +40,7 @@ namespace WaterCompanyWeb.Data
                     PhoneNumber = "911789217"
                 };
 
-                var result = await _userHelper.AddUserAsync(user, "123456");
+                var result = await _userHelper.AddUserAsync(user, "123456", "Admin");
 
                 if (result != IdentityResult.Success)
                 {

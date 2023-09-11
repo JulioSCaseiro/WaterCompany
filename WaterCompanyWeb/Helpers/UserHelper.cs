@@ -23,9 +23,17 @@ namespace WaterCompanyWeb.Helpers
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult> AddUserAsync(User user, string password)
+        public async Task<IdentityResult> AddUserAsync(User user, string password, string roleName)
         {
-            return await _userManager.CreateAsync(user, password);
+            var result = await _userManager.CreateAsync(user, password);
+            if (result.Succeeded)
+            {
+                if (!string.IsNullOrEmpty(roleName))
+                {
+                    await AddUserToRoleAsync(user, roleName);
+                }
+            }
+            return result;
         }
 
         public async Task AddUserToRoleAsync(User user, string roleName)

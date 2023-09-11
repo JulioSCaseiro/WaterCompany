@@ -12,7 +12,7 @@ namespace WaterCompanyWeb.Helpers
 
         Task<List<User>> GetAllUsersAsync();
 
-        Task<IdentityResult> AddUserAsync(User user, string password);
+        Task<IdentityResult> AddUserAsync(User user, string password, string roleName);
 
         Task<SignInResult> LoginAsync(LoginViewModel model);
 

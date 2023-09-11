@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -87,8 +86,9 @@ namespace WaterCompanyWeb.Controllers
         public IActionResult Register()
         {
             var role = _roleManager.Roles.ToList();
-            ViewBag.Roles = new SelectList(role);
+            ViewBag.Roles = new SelectList(role, "Name", "Name");
             return View();
+
         }
 
         [RoleAuthorization("Admin")]
@@ -109,49 +109,56 @@ namespace WaterCompanyWeb.Controllers
                         UserName = model.Username,
                         PhoneNumber = model.PhoneNumber
                     };
-
-                    var result = await _userHelper.AddUserAsync(user, model.Password);
-                    if (result != IdentityResult.Success)
+                    var result = await _userHelper.AddUserAsync(user, model.Password, model.SelectedRole);
+                    if (result.Succeeded)
                     {
-                        ModelState.AddModelError(string.Empty, "The user couldn't be created.");
-                        return View(model);
-                    }
+                        // Check if the selected role exists
+                        var roleExists = await _roleManager.RoleExistsAsync(model.SelectedRole);
+                        if (!roleExists)
+                        {
+                            // If the role doesn't exist, create the role
+                            await _roleManager.CreateAsync(new IdentityRole(model.SelectedRole));
+                        }
 
-                    // Add the user to the role
-                    if (model.SelectedRole == "Client")
-                    {
-                        await _userHelper.AddUserToRoleAsync(user, "Client");
+                        // Add the user to the selected role
+                        await _userHelper.AddUserToRoleAsync(user, model.SelectedRole);
+
+
+                        string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                        string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                        {
+                            userid = user.Id,
+                            token = myToken
+                        }, protocol: HttpContext.Request.Scheme);
+
+                        Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                            $"Your access Email is: {user.UserName}. \n" +
+                            $"To be able to use the Water Company website, " +
+                            $"plase click in this link to confirm your email and " +
+                            $"proceed to change your password:</br></br><a href = \"{tokenLink}\"><b>Confirm Email</b></a>");
+
+                        if (response.IsSuccess)
+                        {
+                            ViewBag.Message = "The instructions have been sent through email to your new user";
+                            return View(model);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "The email couldn't be sent.");
+                        }
                     }
                     else
                     {
-                        await _userHelper.AddUserToRoleAsync(user, "Staff");
+                        // Handle user creation failure
+                        // Show error messages
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
                     }
-
-                }
-
-                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                {
-                    userid = user.Id,
-                    token = myToken
-                }, protocol: HttpContext.Request.Scheme);
-
-                Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                    $"Your access Email is: {user.UserName}. \n" +
-                    $"To be able to use the Water Company website, " +
-                    $"plase click in this link to confirm your email and " +
-                    $"proceed to change your password:</br></br><a href = \"{tokenLink}\"><b>Confirm Email</b></a>");
-
-                if (response.IsSuccess)
-                {
-                    ViewBag.Message = "The instructions have been sent through email to your new user";
-                    return View(model);
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "The email couldn't be sent.");
                 }
             }
+            ViewBag.Roles = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
             return View(model);
         }
 
