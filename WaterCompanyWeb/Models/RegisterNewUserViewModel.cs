@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
@@ -36,8 +38,10 @@ namespace WaterCompanyWeb.Models
         [Display(Name = "Phone Number")]
         public string PhoneNumber{ get; set; }
 
-        [Required(ErrorMessage = "Role is required")]
+        [Required(ErrorMessage = "Role required")]
         [Display(Name = "Role")]
-        public string SelectedRole { get; set; }
+        public string AccountRole { get; set; }
+
+        public IEnumerable<SelectListItem> Roles { get; set; }
     }
 }

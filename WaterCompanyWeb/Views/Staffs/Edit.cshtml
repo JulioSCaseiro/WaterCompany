@@ -1,4 +1,4 @@
-﻿@model WaterCompanyWeb.Models.ClientViewModel
+﻿@model WaterCompanyWeb.Models.StaffViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -65,7 +65,7 @@
             <div>
                 <button asp-action="Edit" asp-for="Id" class="btn"><i class="fa fa-save fa-lg" style="color: #9A8174;"></i> Save</button> @*SAVE BUTTON*@
                 <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Back</a> @*BACK BUTTON*@
-                @if (this.User.IsInRole("Client"))
+                @if (this.User.IsInRole("Staff"))
                 {
                     <a asp-action="ChangePassword" asp-controller="Account" class="btn btn-outline-success"><i class="fa-solid fa-key fa-lg" style="color: #9A8174;"></i> Change Password</a> @*CHANGE PW BUTTON*@
                 }
@@ -73,8 +73,6 @@
         </form>
     </div>
 </div>
-
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
 using WaterCompanyWeb.Models;
@@ -24,12 +25,16 @@ namespace WaterCompanyWeb.Controllers
         private readonly IMailHelper _mailHelper;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IClientRepository _clientRepository;
+        private readonly IStaffRepository _staffRepository;
         private readonly UserManager<User> _userManager;
 
         public AccountController(IUserHelper userHelper,
             IMailHelper mailHelper,
             IConfiguration configuration,
             RoleManager<IdentityRole> roleManager,
+            IClientRepository clientRepository,
+            IStaffRepository staffRepository,
             UserManager<User> userManager
             )
         {
@@ -37,6 +42,8 @@ namespace WaterCompanyWeb.Controllers
             _mailHelper = mailHelper;
             _configuration = configuration;
             _roleManager = roleManager;
+            _clientRepository = clientRepository;
+            _staffRepository = staffRepository;
             _userManager = userManager;
         }
 
@@ -86,9 +93,23 @@ namespace WaterCompanyWeb.Controllers
         [RoleAuthorization("Admin")]
         public IActionResult Register()
         {
-            var role = _roleManager.Roles.ToList();
-            ViewBag.Roles = new SelectList(role);
-            return View();
+            var list = _roleManager.Roles.Select(c => new SelectListItem
+            {
+                Text = c.Name,
+                Value = c.Id.ToString()
+            }).ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "Please select a role from below",
+                Value = "0"
+            });
+
+            var model = new RegisterNewUserViewModel
+            {
+                Roles = list
+            };
+            return View(model);
         }
 
         [RoleAuthorization("Admin")]
@@ -117,16 +138,59 @@ namespace WaterCompanyWeb.Controllers
                         return View(model);
                     }
 
-                    // Add the user to the role
-                    if (model.SelectedRole == "Client")
+                    var role = await _roleManager.FindByIdAsync(model.AccountRole);
+                    if (role.Name == "Client")
                     {
+                        Client client = new Client
+                        {
+                            FirstName = model.FirstName,
+                            LastName = model.LastName,
+                            Email = model.Email,
+                            Address = "Client must fill this field",
+                            PhoneNumber = model.PhoneNumber,
+                            ZIPCode = "0000-000",
+                            NIF = "000000000",
+                            User = user
+                        };
                         await _userHelper.AddUserToRoleAsync(user, "Client");
+                        await _clientRepository.CreateAsync(client);
+                        await _userHelper.UpdateUserAsync(user);
+                        //Verify if the user is in the role "Client"
+                        var isInRole = await _userHelper.IsUserInRoleAsync(user, "Client");
+                        if (!isInRole)
+                        {
+                            await _userHelper.AddUserToRoleAsync(user, "Client");
+                        }
+                    }
+
+                    else if (role.Name == "Staff")
+                    {
+                        Staff staff = new Staff
+                        {
+                            FirstName = model.FirstName,
+                            LastName = model.LastName,
+                            Email = model.Email,
+                            Address = "Staff must fill this field",
+                            PhoneNumber = model.PhoneNumber,
+                            ZIPCode = "0000-000",
+                            NIF = "000000000",
+                            User = user
+                        };
+
+                        await _userHelper.AddUserToRoleAsync(user, "Staff");
+                        await _staffRepository.CreateAsync(staff);
+                        await _userHelper.UpdateUserAsync(user);
+                        var isInRole = await _userHelper.IsUserInRoleAsync(user, "Staff");
+                        if (!isInRole)
+                        {
+                            await _userHelper.AddUserToRoleAsync(user, "Staff");
+                        }
                     }
                     else
                     {
-                        await _userHelper.AddUserToRoleAsync(user, "Staff");
+                            ModelState.AddModelError(string.Empty, "You cannot create an admin account.");
+                            return View(model);
                     }
-
                 }
 
                 string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
@@ -137,7 +201,7 @@ namespace WaterCompanyWeb.Controllers
                 }, protocol: HttpContext.Request.Scheme);
 
                 Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
-                    $"Your access Email is: {user.UserName}. \n" +
+                    $"Your access Email is: {user.UserName}.</br></br>" +
                     $"To be able to use the Water Company website, " +
                     $"plase click in this link to confirm your email and " +
                     $"proceed to change your password:</br></br><a href = \"{tokenLink}\"><b>Confirm Email</b></a>");
@@ -166,13 +230,13 @@ namespace WaterCompanyWeb.Controllers
             if (ModelState.IsValid)
             {
                 Response response = _mailHelper.SendEmail("watercompanyjulio@gmail.com", "Account Register Request", $"<h1>Account Register Request</h1>" +
-                    $"New request from a client to create an account with the following information: \n" +
-                    $"<a>First Name: {model.FirstName}, </a>" +
-                    $"<a>Last Name: {model.LastName}, </a>" +
-                    $"Phone number: {model.PhoneNumber}, \n" +
-                    $"Username: {model.Username}, \n" +
-                    $"Email: {model.Email}, \n" +
-                    $"<b>Create the following client with the information given.</b></a>");
+                    $"</br></br>             New request from a client to create an account with the following information:" +
+                    $"</br></br>             First Name: {model.FirstName}," +
+                    $"</br></br>             Last Name: {model.LastName}, "+
+                    $"</br></br>             Phone number: {model.PhoneNumber}," +
+                    $"</br></br>             Username: {model.Username}," +
+                    $"</br></br>             Email: {model.Email}," +
+                    $"</br></br><b>          Create the following client with the information given.</b>");
 
                 if (response.IsSuccess)
                 {
@@ -187,37 +251,7 @@ namespace WaterCompanyWeb.Controllers
 
             return View(model);
         }
-
-        public async Task<IActionResult> UserList()
-        {
-            var users = await _userHelper.GetAllUsersAsync();
-
-            // Create a URL that includes the current URL as a query parameter
-            var currentUrl = Url.Action("UserList", "Account", null, Request.Scheme);
-
-            // Get all roles to be used in the view
-            var allRoles = await _roleManager.Roles.ToListAsync();
-
-            var usersWithRoles = new List<UserWithRolesViewModel>();
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                // Map roles to their names and filter out empty names
-                var roleNames = roles.Select(role => allRoles.FirstOrDefault(r => r.Name == role)?.Name)
-                                     .Where(name => !string.IsNullOrEmpty(name))
-                                     .ToList();
-
-                usersWithRoles.Add(new UserWithRolesViewModel
-                {
-                    User = user,
-                    Roles = roleNames,
-                    UserListUrl = currentUrl // Pass the URL to the view model
-                });
-            }
-
-            return View(usersWithRoles);
-        }
+        
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);

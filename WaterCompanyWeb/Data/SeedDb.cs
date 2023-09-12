@@ -61,21 +61,22 @@ namespace WaterCompanyWeb.Data
 
             if (!_context.Clients.Any())
             {
-                AddClient("Jorge Manuel", user);
-                AddClient("Pedro Teixeira", user);
-                AddClient("Eduardo Fonseca", user);
+                AddClient("Jorge", "Manuel", user);
+                AddClient("Pedro", "Teixeira",user);
+                AddClient("Eduardo", "Fonseca", user);
                 await _context.SaveChangesAsync();
             }
         }
 
-        private void AddClient(string name, User user)
+        private void AddClient(string firstName, string lastName, User user)
         {
             _context.Clients.Add(new Client
             {
-                ClientName = name,
-                Phone = Convert.ToString(_random.Next(930000000, 969999999)),
+                FirstName = firstName,
+                LastName = lastName,
+                PhoneNumber = Convert.ToString(_random.Next(930000000, 969999999)),
                 Address = "Rua dos testes",
-                PostalCode = "6969-404",
+                ZIPCode = "6969-404",
                 NIF = Convert.ToString(_random.Next(000000000, 999999999)),
                 Email = "esteemailetop@gmail.com",
                 IsAvailable = true,

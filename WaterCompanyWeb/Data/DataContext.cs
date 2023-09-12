@@ -10,6 +10,8 @@ namespace WaterCompanyWeb.Data
 
         public DbSet<WaterMeter> WaterMeter { get; set; }
 
+        public DbSet<Staff> Staff { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     }
 }

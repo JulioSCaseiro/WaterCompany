@@ -5,12 +5,10 @@ using WaterCompanyWeb.Data.Entities;
 
 namespace WaterCompanyWeb.Models
 {
-    public class UserWithRolesViewModel
+    public class UserWithRolesViewModel : User
     {
-        public List<string> Roles { get; set; }
+        public string UserId { get; set; }
 
-        public User User { get; set; }
-
-        public string UserListUrl { get; set; }
+        public IEnumerable<string> Roles { get; set; }
     }
 }

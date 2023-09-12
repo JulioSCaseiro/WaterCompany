@@ -9,13 +9,16 @@ namespace WaterCompanyWeb.Data.Entities
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(50, ErrorMessage = "The field {0} can only contain {1} characters lenght.")]
-        [Display(Name = "Client Name")]
-        public string ClientName { get; set; }
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
 
         [MinLength(9, ErrorMessage = "Incorrect phone number. (Number too short)")]
         [MaxLength(9, ErrorMessage = "Incorrect phone number. (Number too big)")]
-        public string Phone { get; set; }
+        public string PhoneNumber { get; set; }
 
         [Required]
         [EmailAddress]
@@ -27,7 +30,7 @@ namespace WaterCompanyWeb.Data.Entities
         [Required]
         [RegularExpression(@"^\d{4}(-\d{3})?$", ErrorMessage = "Invalid Zip code!")]
         [Display(Name = "Zip code")]
-        public string PostalCode { get; set; }
+        public string ZIPCode { get; set; }
 
         [Required]
         [MinLength(9)]

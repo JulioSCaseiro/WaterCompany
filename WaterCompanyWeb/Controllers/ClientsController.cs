@@ -32,14 +32,14 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients
-        //[Authorize(Roles = "Admin")]
+        [RoleAuthorization("Admin")]
         public IActionResult Index()
         {
-            return View(_clientRepository.GetAll().OrderBy(p => p.ClientName));
+            return View(_clientRepository.GetAllWithUsers());
         }
 
         // GET: Clients/Details/5
-        //[Authorize(Roles = "Admin")]
+        [RoleAuthorization("Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -57,7 +57,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients/Edit/5
-        //[Authorize(Roles = "Admin")]
+        [RoleAuthorization("Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,6 +81,7 @@ namespace WaterCompanyWeb.Controllers
         //[Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RoleAuthorization("Admin")]
         public async Task<IActionResult> Edit(ClientViewModel model)
         {
             if (ModelState.IsValid)
@@ -118,7 +119,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Clients/Delete/5
-        [Authorize(Roles = "Admin")]
+        [RoleAuthorization("Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,7 +137,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // POST: Clients/Delete/5
-        [Authorize(Roles = "Admin")]
+        [RoleAuthorization("Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

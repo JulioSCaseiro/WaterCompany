@@ -1,0 +1,22 @@
+﻿@model WaterCompanyWeb.Data.Entities.Staff
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Staff</h4>
+    <hr />
+    <dl class="row">
+        <partial name="_StaffsDeleteDetails" />
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button action="Delete" asp-for="Id" class="btn"><i class="fas fa-trash-alt fa-lg" style="color: #9A8174;"></i> Delete</button> @*DELETE BUTTON*@
+        <a asp-action="Index" class="btn"><i class="fa fa-rotate-left fa-lg" style="color: #9A8174;"></i> Return</a> @*RETURN BUTTON*@
+    </form>
+</div>

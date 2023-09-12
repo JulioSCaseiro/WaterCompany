@@ -62,6 +62,7 @@ namespace WaterCompanyWeb
             services.AddControllersWithViews();
             services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IStaffRepository, StaffRepository>();
             services.AddScoped<IImageHelper, ImageHelper>();
             services.AddScoped<IConverterHelper, ConverterHelper>();
             services.AddScoped<IClientRepository, ClientRepository>();
