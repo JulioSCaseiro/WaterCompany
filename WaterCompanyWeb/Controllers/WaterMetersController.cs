@@ -5,149 +5,258 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
+using WaterCompanyWeb.Helpers;
+using WaterCompanyWeb.Models;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace WaterCompanyWeb.Controllers
 {
     public class WaterMetersController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IUserHelper _userHelper;
+        private readonly IClientRepository _clientRepository;
+        private readonly IWaterMeterRepository _waterMeterRepository;
 
-        public WaterMetersController(DataContext context)
+        public WaterMetersController(
+            IUserHelper userHelper,
+            IClientRepository clientRepository,
+            IWaterMeterRepository waterMeterRepository)
         {
-            _context = context;
+            _userHelper = userHelper;
+            _clientRepository = clientRepository;
+            _waterMeterRepository = waterMeterRepository;
         }
 
         // GET: WaterMeters
-        public async Task<IActionResult> Index()
+        [RoleAuthorization("Staff", "Client")]
+        public IActionResult Index()
         {
-            return View(await _context.WaterMeter.ToListAsync());
+            var waterMeters = _waterMeterRepository.GetAllWithClients();
+            return View(waterMeters);
         }
 
         // GET: WaterMeters/Details/5
+        [RoleAuthorization("Staff", "Client")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("WaterMeterNotFound");
             }
 
-            var waterMeter = await _context.WaterMeter
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var waterMeter = await _waterMeterRepository.GetWaterMeterWithClients(id.Value);
             if (waterMeter == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("WaterMeterNotFound");
             }
 
             return View(waterMeter);
         }
 
         // GET: WaterMeters/Create
+        [RoleAuthorization("Staff", "Client")]
         public IActionResult Create()
         {
-            return View();
+            var model = new WaterMeterViewModel
+            {
+                Clients = _waterMeterRepository.GetComboClients(),
+            };
+
+            return View(model);
         }
 
         // POST: WaterMeters/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WaterMeter waterMeter)
+        [RoleAuthorization("Staff", "Client")]
+        public async Task<IActionResult> Create(WaterMeterViewModel model)
         {
+            var client = await _waterMeterRepository.GetClientsAsync(model.ClientId);
             if (ModelState.IsValid)
             {
-                _context.Add(waterMeter);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(waterMeter);
-        }
+                
+                double value = 0;
+                double totalConsumption = model.TotalConsumption;
 
-        // GET: WaterMeters/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var waterMeter = await _context.WaterMeter.FindAsync(id);
-            if (waterMeter == null)
-            {
-                return NotFound();
-            }
-            return View(waterMeter);
-        }
-
-        // POST: WaterMeters/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, WaterMeter waterMeter)
-        {
-            if (id != waterMeter.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                do
                 {
-                    _context.Update(waterMeter);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!WaterMeterExists(waterMeter.Id))
+                    if (totalConsumption > 25)
                     {
-                        return NotFound();
+                        do
+                        {
+                            value += 1.60;
+                            totalConsumption -= 1;
+                        } while (totalConsumption > 25);
                     }
                     else
                     {
-                        throw;
+                        if (totalConsumption > 15)
+                        {
+                            do
+                            {
+                                value += 1.20;
+                                totalConsumption -= 1;
+                            } while (totalConsumption > 15);
+                        }
+                        else if (totalConsumption > 5)
+                        {
+                            do
+                            {
+                                value += 0.80;
+                                totalConsumption -= 1;
+                            } while (totalConsumption > 5);
+                        }
+                        else if (totalConsumption > 0)
+                        {
+                            do
+                            {
+                                value += 0.30;
+                                totalConsumption -= 1;
+                            } while (totalConsumption > 0);
+                        }
+
                     }
-                }
+                } while (totalConsumption > 0);
+
+                WaterMeter waterMeter = new WaterMeter
+                {
+                    Client = client,
+                    ConsumptionDate = model.ConsumptionDate,
+                    Value = value,
+                    TotalConsumption = model.TotalConsumption
+                };
+
+                await _waterMeterRepository.CreateAsync(waterMeter);
                 return RedirectToAction(nameof(Index));
             }
-            return View(waterMeter);
+            return View(model);
+        }
+
+        // GET: WaterMeters/Edit/5
+        [RoleAuthorization("Staff")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            var client = await _waterMeterRepository.GetClientsAsync(id.Value);
+            var waterMeters = await _waterMeterRepository.GetWaterMeterWithClients(id.Value);
+            var model = new WaterMeterViewModel();
+            if (waterMeters == null)
+            {
+                return new NotFoundViewResult("WaterMeterNotFound");
+            }
+            else
+            {
+                model.ClientId = model.Id;
+                model.Value = waterMeters.Value;
+                model.ConsumptionDate = waterMeters.ConsumptionDate;
+                model.TotalConsumption = waterMeters.TotalConsumption;
+            }
+            model.Clients = _waterMeterRepository.GetComboClients();
+            return View(model);
+        }
+
+        // POST: WaterMeters/Edit/5
+        [HttpPost]
+        [RoleAuthorization("Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, WaterMeterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var waterMeter = await _waterMeterRepository.GetWaterMeterWithClients(id);
+                if (waterMeter != null)
+                {
+                    var client = await _waterMeterRepository.GetClientsAsync(model.ClientId);
+                    double value = 0;
+                    double totalConsumption = model.TotalConsumption;
+
+                    do
+                    {
+                        if (totalConsumption > 25)
+                        {
+                            do
+                            {
+                                value += 1.60;
+                                totalConsumption -= 1;
+                            } while (totalConsumption > 25);
+                        }
+                        else
+                        {
+                            if (totalConsumption > 15)
+                            {
+                                do
+                                {
+                                    value += 1.20;
+                                    totalConsumption -= 1;
+                                } while (totalConsumption > 15);
+                            }
+                            else if (totalConsumption > 5)
+                            {
+                                do
+                                {
+                                    value += 0.80;
+                                    totalConsumption -= 1;
+                                } while (totalConsumption > 5);
+                            }
+                            else if (totalConsumption > 0)
+                            {
+                                do
+                                {
+                                    value += 0.30;
+                                    totalConsumption -= 1;
+                                } while (totalConsumption > 0);
+                            }
+
+                        }
+                    } while (totalConsumption > 0);
+
+                    waterMeter.Client = client;
+                    waterMeter.ConsumptionDate = model.ConsumptionDate;
+                    waterMeter.Value = value;
+                    waterMeter.TotalConsumption = model.TotalConsumption;
+
+                    await _waterMeterRepository.UpdateAsync(waterMeter);
+                    var allConsumptions = _waterMeterRepository.GetAllWithClients();
+                    return View("Index", allConsumptions);
+                }
+            }
+            return View(model);
         }
 
         // GET: WaterMeters/Delete/5
+        [RoleAuthorization("Staff")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("WaterMeterNotFound");
             }
 
-            var waterMeter = await _context.WaterMeter
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var waterMeter = await _waterMeterRepository.GetWaterMeterWithClients(id.Value);
             if (waterMeter == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("WaterMeterNotFound");
             }
 
             return View(waterMeter);
         }
 
         // POST: WaterMeters/Delete/5
+        [RoleAuthorization("Staff")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var waterMeter = await _context.WaterMeter.FindAsync(id);
-            _context.WaterMeter.Remove(waterMeter);
-            await _context.SaveChangesAsync();
+            var waterMeter = await _waterMeterRepository.GetByIdAsync(id);
+            await _waterMeterRepository.DeleteAsync(waterMeter);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool WaterMeterExists(int id)
+        public IActionResult WaterMeterNotFound()
         {
-            return _context.WaterMeter.Any(e => e.Id == id);
+            return View();
         }
     }
 }

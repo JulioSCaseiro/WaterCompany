@@ -44,9 +44,9 @@
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-warning"></span>
             </div>
-            <div class="text-center form-outline flex-fill mb-0">
+            <div class="form-group">
                 <label asp-for="AccountRole" class="control-label"></label>
-                <select asp-for="AccountRole" asp-items="Model.Roles" class=" form-control text-center"></select>
+                <select asp-for="AccountRole" asp-items="Model.Roles" class=" form-control"></select>
                 <span asp-validation-for="AccountRole" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -33,7 +33,7 @@ namespace WaterCompanyWeb.Controllers
 
         // GET: Clients
         [RoleAuthorization("Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View(_clientRepository.GetAllWithUsers());
         }

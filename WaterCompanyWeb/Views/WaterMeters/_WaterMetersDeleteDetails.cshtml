@@ -1,10 +1,16 @@
 ﻿@model WaterCompanyWeb.Data.Entities.WaterMeter
 
 <dt class="col-sm-2">
-    @Html.DisplayNameFor(model => model.Rank)
+    @Html.DisplayNameFor(model => model.Client.FirstName)
 </dt>
 <dd class="col-sm-10">
-    @Html.DisplayFor(model => model.Rank)
+    @Html.DisplayFor(model => model.Client.FirstName)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Client.Email)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Client.Email)
 </dd>
 <dt class="col-sm-2">
     @Html.DisplayNameFor(model => model.ConsumptionDate)
@@ -23,4 +29,10 @@
 </dt>
 <dd class="col-sm-10">
     @Html.DisplayFor(model => model.TotalConsumption)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Id)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Id)
 </dd>

@@ -11,7 +11,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Rank)
+                @Html.DisplayNameFor(model => model.Client.FirstName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ConsumptionDate)
@@ -27,9 +27,9 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+            <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Rank)
+                @Html.DisplayFor(modelItem => item.Client.FirstName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ConsumptionDate)

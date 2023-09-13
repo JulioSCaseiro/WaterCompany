@@ -1,4 +1,4 @@
-﻿@model WaterCompanyWeb.Data.Entities.WaterMeter
+﻿@model WaterCompanyWeb.Models.WaterMeterViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,8 +10,28 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <partial name="_WaterMetersCreateEdit" />
+            @*<div class="form-group">
+                <label asp-for="ClientId" class="control-label"></label>
+                <select asp-for="ClientId" asp-items="Model.Clients" class=" form-control"></select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
             <div class="form-group">
-                <button type="submit" class="btn"><i class="fa fa-save fa-lg" style="color: #B38B59;"></i> Create</button>
+                <label asp-for="ConsumptionDate" class="control-label"></label>
+                <input asp-for="ConsumptionDate" class="form-control">
+                <span asp-validation-for="ConsumptionDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Value" class="control-label" disabled></label>
+                <input asp-for="Value" class="form-control" disabled />
+                <span asp-validation-for="Value" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TotalConsumption" class="control-label"></label>
+                <input asp-for="TotalConsumption" class="form-control" />
+                <span asp-validation-for="TotalConsumption" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <button type="submit" value="Create" class="btn"><i class="fa fa-save fa-lg" style="color: #B38B59;"></i> Create</button>
             </div>
         </form>
     </div>

@@ -8,7 +8,7 @@ namespace WaterCompanyWeb.Data
     {
         public DbSet<Client> Clients { get; set; }
 
-        public DbSet<WaterMeter> WaterMeter { get; set; }
+        public DbSet<WaterMeter> WaterMeters { get; set; }
 
         public DbSet<Staff> Staff { get; set; }
 
