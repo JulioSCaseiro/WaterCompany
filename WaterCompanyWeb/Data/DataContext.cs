@@ -12,6 +12,8 @@ namespace WaterCompanyWeb.Data
 
         public DbSet<Staff> Staff { get; set; }
 
+        public DbSet<Invoice> Invoices { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     }
 }

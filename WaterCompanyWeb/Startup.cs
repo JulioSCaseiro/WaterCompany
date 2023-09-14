@@ -67,6 +67,7 @@ namespace WaterCompanyWeb
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<IWaterMeterRepository, WaterMeterRepository>();
             services.AddScoped<IStaffRepository, StaffRepository>();
+            services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddScoped<IMailHelper, MailHelper>();
             services.ConfigureApplicationCookie(options =>
             {

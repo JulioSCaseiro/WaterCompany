@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 using WaterCompanyWeb.Data;
@@ -13,15 +14,21 @@ namespace WaterCompanyWeb.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IClientRepository _clientRepository;
         private readonly IWaterMeterRepository _waterMeterRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IMailHelper _mailHelper;
 
         public WaterMetersController(
             IUserHelper userHelper,
             IClientRepository clientRepository,
-            IWaterMeterRepository waterMeterRepository)
+            IWaterMeterRepository waterMeterRepository,
+            IInvoiceRepository invoiceRepository,
+            IMailHelper mailHelper)
         {
             _userHelper = userHelper;
             _clientRepository = clientRepository;
             _waterMeterRepository = waterMeterRepository;
+            _invoiceRepository = invoiceRepository;
+            _mailHelper = mailHelper;
         }
 
         // GET: WaterMeters
@@ -304,7 +311,80 @@ namespace WaterCompanyWeb.Controllers
             }
             return View(model);
         }
+        [RoleAuthorization("Staff")]
+        // GET: WaterMeters/CreateInvoice
+        public async Task<IActionResult> CreateInvoice(int? id)
+        {
+            if (id.HasValue)
+            {
+                var waterMeter = await _waterMeterRepository.GetWaterMeterWithClients(id.Value);
+                var model = new WaterMeterViewModel();
+                if (waterMeter == null)
+                {
+                    return RedirectToAction("WaterMeterNotFound", "WaterMeters");
+                }
+                else
+                {
+                    model.Client = waterMeter.Client;
+                    model.ClientId = waterMeter.Client.Id;
+                    model.Value = waterMeter.Value;
+                    model.ConsumptionDate = waterMeter.ConsumptionDate;
+                }
+                model.Clients = _waterMeterRepository.GetComboClients();
+                return View(model);
+            }
+            return RedirectToAction("ClientNotFound", "Clients");
 
+        }
+
+        [RoleAuthorization("Staff")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateInvoice(int id, WaterMeterViewModel model)
+        {
+            var waterMeter = await _waterMeterRepository.GetWaterMeterWithClients(id);
+
+            model.Client = waterMeter.Client;
+            model.ClientId = waterMeter.Client.Id;
+            model.ConsumptionDate = waterMeter.ConsumptionDate;
+            model.Value = waterMeter.Value;
+
+            try
+            {
+                Invoice invoice = new Invoice
+                {
+                    Date = DateTime.Now
+                };
+
+                await _invoiceRepository.CreateAsync(invoice);
+
+                invoice.Client = model.Client;
+                invoice.WaterMeter = waterMeter;
+                invoice.Value = model.Value;
+                invoice.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+
+                await _invoiceRepository.UpdateAsync(invoice);
+
+                Response response = _mailHelper.SendEmail(invoice.Client.Email, "New Invoice", "A new invoice was created");
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction("Index", "Invoices");
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _waterMeterRepository.ExistAsync(model.Id))
+                {
+                    return RedirectToAction("WaterMeterNotFound", "WaterMeters");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return View(model);
+
+        }
         // GET: WaterMeters/Delete/5
         [RoleAuthorization("Staff")]
         public async Task<IActionResult> Delete(int? id)

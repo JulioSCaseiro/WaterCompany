@@ -11,8 +11,12 @@ namespace WaterCompanyWeb.Data.Entities
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime Date { get; set; }
-        public decimal Value { get; set; }
+        public double Value { get; set; }
         [Display(Name = "Water Meter Counter")]
         public WaterMeter WaterMeter { get; set; }
+
+        public Client Client { get; set; }
+
+        public User User { get; set; }
     }
 }
