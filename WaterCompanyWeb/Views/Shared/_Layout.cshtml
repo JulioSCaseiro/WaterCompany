@@ -23,16 +23,31 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Client") || this.User.IsInRole("Staff"))
+                        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Client"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="WaterMeters" asp-action="WaterMetersByClient">Water Meters</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
+                            </li>
+                        }
+                        else if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Staff"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="WaterMeters" asp-action="Index">Water Meters</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
                             </li>
                         }
                         else
                         {
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="NotAuthorized">Water Meters</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="NotAuthorized">Invoices</a>
                         </li>
                         }
                     </ul>

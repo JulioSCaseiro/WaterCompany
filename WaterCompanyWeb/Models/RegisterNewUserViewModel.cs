@@ -37,6 +37,14 @@ namespace WaterCompanyWeb.Models
         [Required]
         [Display(Name = "Phone Number")]
         public string PhoneNumber{ get; set; }
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public string NIF { get; set; }
+
+        [Required]
+        public string ZIP { get; set; }
 
         [Required(ErrorMessage = "Role required")]
         [Display(Name = "Role")]

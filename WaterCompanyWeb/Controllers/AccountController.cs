@@ -62,7 +62,11 @@ namespace WaterCompanyWeb.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username);
-
+                if (user == null)
+                {
+                    this.ModelState.AddModelError(string.Empty, "Failed to login");
+                }
+                else
                 if (user != null && await _userManager.IsInRoleAsync(user, "Admin") ||
                                     await _userManager.IsInRoleAsync(user, "Staff") ||
                                     await _userManager.IsInRoleAsync(user, "Client"))
@@ -74,13 +78,10 @@ namespace WaterCompanyWeb.Controllers
                         {
                             return Redirect(this.Request.Query["ReturnUrl"].First());
                         }
-
                         return RedirectToAction("Index", "Home");
                     }
                 }
             }
-
-            this.ModelState.AddModelError(string.Empty, "Failed to login");
             return View(model);
         }
 
@@ -128,7 +129,10 @@ namespace WaterCompanyWeb.Controllers
                         LastName = model.FirstName,
                         Email = model.Username,
                         UserName = model.Username,
-                        PhoneNumber = model.PhoneNumber
+                        PhoneNumber = model.PhoneNumber,
+                        Address = model.Address,
+                        ZIPCode = model.ZIP,
+                        NIF = model.NIF
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
@@ -260,6 +264,9 @@ namespace WaterCompanyWeb.Controllers
             {
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
+                model.PhoneNumber = user.PhoneNumber;
+                model.Address = user.Address;
+                model.NIF = user.NIF;
             }
 
             return View(model);
@@ -275,10 +282,13 @@ namespace WaterCompanyWeb.Controllers
                 {
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.Address = model.Address;
+                    user.NIF = model.NIF;
                     var response = await _userHelper.UpdateUserAsync(user);
                     if (response.Succeeded)
                     {
-                        ViewBag.UserMessage = "User updated";
+                        ViewBag.UserMessage = "User updated successfully";
                     }
                     else
                     {

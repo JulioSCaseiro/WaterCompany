@@ -29,9 +29,9 @@ namespace WaterCompanyWeb.Data
             await _context.SaveChangesAsync();
         }
 
-        public IQueryable GetAllByClient(int id)
+        public IQueryable GetAllByClient(string email)
         {
-            return _context.WaterMeters.Where(c => c.Client.Id == id);
+            return _context.WaterMeters.Where(c => c.Client.Email == email);
         }
 
         public IQueryable GetAllWithClients()

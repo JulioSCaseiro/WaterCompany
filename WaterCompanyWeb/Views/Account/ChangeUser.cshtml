@@ -7,6 +7,21 @@
     <div class="col-md-4 offset-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageUrl" />
+            <div>
+                <div class="form-group">
+                    <label asp-for="ImageFile" class="control-label"></label>
+                    <input asp-for="ImageFile" class="form-control" type="file" placeholder="" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Url.Content(Model.ImageUrl)" alt="Image" style="width: auto; height: 400px;" />
+                }
+            </div>
             <div class="form-group">
                 <label asp-for="FirstName">First Name</label>
                 <input asp-for="FirstName" class="form-control" />
@@ -18,8 +33,28 @@
                 <span asp-validation-for="LastName" class="text-warning"></span>
             </div>
             <div class="form-group">
+                <label asp-for="PhoneNumber">Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-warning"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address">Address</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-warning"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NIF">NIF</label>
+                <input asp-for="NIF" class="form-control" />
+                <span asp-validation-for="NIF" class="text-warning"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ZIPCode">ZIPCode</label>
+                <input asp-for="ZIPCode" class="form-control" />
+                <span asp-validation-for="ZIPCode" class="text-warning"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-primary" />
-                <a asp-action="ChangePassword" class="btn btn-success">Change Password</a>
+                <a asp-action="ChangePassword" asp-controller="Account" class="btn btn-success">Change Password</a>
             </div>
 
             <div class="text-success">@ViewBag.UserMessage</div>

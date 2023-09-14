@@ -18,6 +18,6 @@ namespace WaterCompanyWeb.Data
 
         public Task<Client> GetClientsAsync(int id);
 
-        public IQueryable GetAllByClient(int id);
+        public IQueryable GetAllByClient(string email);
     }
 }

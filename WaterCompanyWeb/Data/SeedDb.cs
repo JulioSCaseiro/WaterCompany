@@ -37,7 +37,11 @@ namespace WaterCompanyWeb.Data
                     LastName = "Caseiro",
                     Email = "watercompanyjulio@gmail.com",
                     UserName = "watercompanyjulio@gmail.com",
-                    PhoneNumber = "911789217"
+                    PhoneNumber = "911789217",
+                    Address = "Rua do vale",
+                    ZIPCode = "2655-319",
+                    NIF = "267310099"
+
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "123456");

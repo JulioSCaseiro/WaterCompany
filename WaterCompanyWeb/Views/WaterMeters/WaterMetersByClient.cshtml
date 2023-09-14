@@ -1,0 +1,41 @@
+﻿@model IEnumerable<WaterCompanyWeb.Data.Entities.WaterMeter>
+@{
+    ViewData["Title"] = "WaterMetersByClient";
+}
+
+
+<p>
+    <a asp-action="CreateByClient" class="btn"> <i class="fa-solid fa-plus fa-fade fa-2xl" style="color: #9A8174;"></i></a>
+</p>
+<table class="table">
+
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ConsumptionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Value)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalConsumption)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ConsumptionDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalConsumption)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

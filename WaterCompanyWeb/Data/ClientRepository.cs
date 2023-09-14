@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 using WaterCompanyWeb.Data.Entities;
 
 namespace WaterCompanyWeb.Data
@@ -16,6 +17,11 @@ namespace WaterCompanyWeb.Data
         public IQueryable GetAllWithUsers()
         {
             return _context.Clients.Include(p => p.User).OrderBy(p => p.Email);
+        }
+
+        public async Task<Client> GetClientByEmailAsync(string email)
+        {
+            return await _context.Clients.Where(c => c.User.Email == email).FirstOrDefaultAsync();
         }
     }
 }

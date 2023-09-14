@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Linq;
-using System;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WaterCompanyWeb.Data.Entities
 {
@@ -15,6 +14,7 @@ namespace WaterCompanyWeb.Data.Entities
         public DateTime ConsumptionDate { get; set; }
 
         public double Value { get; set; }
+
 
         [Display(Name = "Total Consumption")]
         public double TotalConsumption { get; set; }
