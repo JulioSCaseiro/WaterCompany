@@ -225,6 +225,10 @@ namespace WaterCompanyWeb.Controllers
 
         public IActionResult RegisterRequest()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("ChangeUser", "Account");
+            }
             return View();
         }
 
