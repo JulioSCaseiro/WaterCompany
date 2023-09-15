@@ -21,7 +21,7 @@ namespace WaterCompanyWeb.Data
 
         public async Task<Client> GetClientByEmailAsync(string email)
         {
-            return await _context.Clients.Where(c => c.User.Email == email).FirstOrDefaultAsync();
+            return await _context.Clients.Where(c => c.Email == email).FirstOrDefaultAsync();
         }
     }
 }

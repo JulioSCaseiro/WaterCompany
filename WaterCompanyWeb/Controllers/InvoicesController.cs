@@ -115,7 +115,7 @@ namespace WaterCompanyWeb.Controllers
             Client client = await _clientRepository.GetClientByEmailAsync(this.User.Identity.Name);
             if (client == null)
             {
-                return new NotFoundViewResult("InvoiceNotFound");
+                return RedirectToAction("ClientNotFound", "Clients");
             }
             var invoices = _invoiceRepository.GetAllByClient(client.Email);
             if (invoices == null)

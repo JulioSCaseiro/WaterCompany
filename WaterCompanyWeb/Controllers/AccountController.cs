@@ -291,14 +291,15 @@ namespace WaterCompanyWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model, User user)
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Client");
                 var path = model.ImageUrl;
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 if (user != null)
                 {
+                    var isInRole = await _userHelper.IsUserInRoleAsync(user, "Client");
                     if (isInRole)
                     {
                         if (model.ImageFile != null && model.ImageFile.Length > 0)
@@ -313,8 +314,8 @@ namespace WaterCompanyWeb.Controllers
                             path = await _imageHelper.UploadImageAsync(model.ImageFile, "staffs");
                         }
                     }
-                    user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
 
+                    // Update user properties
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
                     user.PhoneNumber = model.PhoneNumber;
@@ -322,6 +323,7 @@ namespace WaterCompanyWeb.Controllers
                     user.NIF = model.NIF;
                     user.ImageUrl = path;
 
+                    // Update user data store
                     var response = await _userHelper.UpdateUserAsync(user);
                     if (response.Succeeded)
                     {
