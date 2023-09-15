@@ -9,12 +9,10 @@
             <div asp-validation-summary="ModelOnly"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ImageUrl" />
-            <div>
-                <div class="form-group">
-                    <label asp-for="ImageFile" class="control-label"></label>
-                    <input asp-for="ImageFile" class="form-control" type="file" placeholder="" />
-                    <span asp-validation-for="ImageFile" class="text-danger"></span>
-                </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" placeholder="" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))

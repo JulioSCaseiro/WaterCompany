@@ -27,6 +27,7 @@ namespace WaterCompanyWeb.Controllers
             _mailHelper = mailHelper;
         }
 
+        [RoleAuthorization("Staff")]
         // GET: Invoices
         public IActionResult Index()
         {
@@ -34,6 +35,7 @@ namespace WaterCompanyWeb.Controllers
             return View(invoices);
         }
 
+        [RoleAuthorization("Staff")]
         // GET: Invoices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -54,6 +56,7 @@ namespace WaterCompanyWeb.Controllers
         // POST: Invoices/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [RoleAuthorization("Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int? id, Invoice model)
@@ -78,6 +81,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // GET: Invoices/Delete/5
+        [RoleAuthorization("Staff")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -94,6 +98,7 @@ namespace WaterCompanyWeb.Controllers
         }
 
         // POST: Invoices/Delete/5
+        [RoleAuthorization("Staff")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -102,6 +107,22 @@ namespace WaterCompanyWeb.Controllers
             var invoice = await _invoiceRepository.GetByIdAsync(id);
             await _invoiceRepository.DeleteAsync(invoice);
             return RedirectToAction(nameof(Index));
+        }
+
+        [RoleAuthorization("Client")]
+        public async Task<IActionResult> InvoicesByClient()
+        {
+            Client client = await _clientRepository.GetClientByEmailAsync(this.User.Identity.Name);
+            if (client == null)
+            {
+                return new NotFoundViewResult("InvoiceNotFound");
+            }
+            var invoices = _invoiceRepository.GetAllByClient(client.Email);
+            if (invoices == null)
+            {
+                return new NotFoundViewResult("InvoiceNotFound");
+            }
+            return View(invoices);
         }
 
         public IActionResult InvoiceNotFound()

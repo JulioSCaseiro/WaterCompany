@@ -55,7 +55,7 @@ namespace WaterCompanyWeb.Helpers
                 ZIPCode = model.ZIPCode,
                 NIF = model.NIF,
                 Email = model.Email,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = path,
                 IsAvailable = model.IsAvailable,
                 User = model.User
                 
@@ -76,6 +76,37 @@ namespace WaterCompanyWeb.Helpers
                 ImageUrl = staff.ImageUrl,
                 IsAvailable = staff.IsAvailable,
                 User = staff.User
+            };
+        }
+
+        public User ToUser(ChangeUserViewModel model, string path, bool isNew)
+        {
+            return new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.PhoneNumber,
+                Email = model.Email,
+                Address = model.Address,
+                ZIPCode = model.ZIPCode,
+                NIF = model.NIF,
+                ImageUrl = path
+            };
+        }
+
+        public ChangeUserViewModel ToUserViewModel(User user)
+        {
+            return new ChangeUserViewModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                Address = user.Address,
+                ZIPCode = user.ZIPCode,
+                NIF = user.NIF,
+                ImageUrl = user.ImageUrl
             };
         }
     }

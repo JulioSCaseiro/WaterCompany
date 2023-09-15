@@ -13,5 +13,9 @@ namespace WaterCompanyWeb.Helpers
         Staff ToStaff(StaffViewModel model, string path, bool isNew);
 
         StaffViewModel ToStaffViewModel(Staff employee);
+
+        User ToUser(ChangeUserViewModel model, string path, bool isNew);
+
+        ChangeUserViewModel ToUserViewModel(User user);
     }
 }

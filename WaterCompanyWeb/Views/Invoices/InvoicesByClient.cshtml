@@ -1,0 +1,43 @@
+﻿@model IEnumerable<WaterCompanyWeb.Data.Entities.Invoice>
+@{
+    ViewData["Title"] = "InvoicesByClient";
+}
+
+<h1>Your Invoices</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Client.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Client.LastName)
+            </th>
+            <th>
+                <i class="fas fa-calendar-week"></i> @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Value)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Client.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Client.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Value)
+                    </td>
+                </tr>
+            }
+    </tbody>
+</table>

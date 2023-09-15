@@ -16,6 +16,7 @@ using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
 using WaterCompanyWeb.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WaterCompanyWeb.Controllers
 {
@@ -27,7 +28,9 @@ namespace WaterCompanyWeb.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IClientRepository _clientRepository;
         private readonly IStaffRepository _staffRepository;
+        private readonly IConverterHelper _converterHelper;
         private readonly UserManager<User> _userManager;
+        private readonly IImageHelper _imageHelper;
 
         public AccountController(IUserHelper userHelper,
             IMailHelper mailHelper,
@@ -35,7 +38,9 @@ namespace WaterCompanyWeb.Controllers
             RoleManager<IdentityRole> roleManager,
             IClientRepository clientRepository,
             IStaffRepository staffRepository,
-            UserManager<User> userManager
+            IConverterHelper converterHelper,
+            UserManager<User> userManager,
+            IImageHelper imageHelper
             )
         {
             _userHelper = userHelper;
@@ -44,7 +49,9 @@ namespace WaterCompanyWeb.Controllers
             _roleManager = roleManager;
             _clientRepository = clientRepository;
             _staffRepository = staffRepository;
+            _converterHelper = converterHelper;
             _userManager = userManager;
+            _imageHelper = imageHelper;
         }
 
         public IActionResult Login()
@@ -79,6 +86,10 @@ namespace WaterCompanyWeb.Controllers
                             return Redirect(this.Request.Query["ReturnUrl"].First());
                         }
                         return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        this.ModelState.AddModelError(string.Empty, "Failed to login");
                     }
                 }
             }
@@ -126,7 +137,7 @@ namespace WaterCompanyWeb.Controllers
                     user = new User
                     {
                         FirstName = model.FirstName,
-                        LastName = model.FirstName,
+                        LastName = model.LastName,
                         Email = model.Username,
                         UserName = model.Username,
                         PhoneNumber = model.PhoneNumber,
@@ -150,10 +161,10 @@ namespace WaterCompanyWeb.Controllers
                             FirstName = model.FirstName,
                             LastName = model.LastName,
                             Email = model.Email,
-                            Address = "Client must fill this field",
+                            Address = model.Address,
                             PhoneNumber = model.PhoneNumber,
-                            ZIPCode = "0000-000",
-                            NIF = "000000000",
+                            ZIPCode = model.ZIP,
+                            NIF = model.NIF,
                             User = user
                         };
                         await _userHelper.AddUserToRoleAsync(user, "Client");
@@ -174,10 +185,10 @@ namespace WaterCompanyWeb.Controllers
                             FirstName = model.FirstName,
                             LastName = model.LastName,
                             Email = model.Email,
-                            Address = "Staff must fill this field",
+                            Address = model.Address,
                             PhoneNumber = model.PhoneNumber,
-                            ZIPCode = "0000-000",
-                            NIF = "000000000",
+                            ZIPCode = model.ZIP,
+                            NIF = model.NIF,
                             User = user
                         };
 
@@ -264,6 +275,7 @@ namespace WaterCompanyWeb.Controllers
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             var model = new ChangeUserViewModel();
+            
             if (user != null)
             {
                 model.FirstName = user.FirstName;
@@ -271,24 +283,45 @@ namespace WaterCompanyWeb.Controllers
                 model.PhoneNumber = user.PhoneNumber;
                 model.Address = user.Address;
                 model.NIF = user.NIF;
+                model.ImageUrl = user.ImageUrl;
             }
 
+            model = _converterHelper.ToUserViewModel(user);
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model, User user)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Client");
+                var path = model.ImageUrl;
                 if (user != null)
                 {
+                    if (isInRole)
+                    {
+                        if (model.ImageFile != null && model.ImageFile.Length > 0)
+                        {
+                            path = await _imageHelper.UploadImageAsync(model.ImageFile, "clients");
+                        }
+                    }
+                    else
+                    {
+                        if (model.ImageFile != null && model.ImageFile.Length > 0)
+                        {
+                            path = await _imageHelper.UploadImageAsync(model.ImageFile, "staffs");
+                        }
+                    }
+                    user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
                     user.PhoneNumber = model.PhoneNumber;
                     user.Address = model.Address;
                     user.NIF = model.NIF;
+                    user.ImageUrl = path;
+
                     var response = await _userHelper.UpdateUserAsync(user);
                     if (response.Succeeded)
                     {

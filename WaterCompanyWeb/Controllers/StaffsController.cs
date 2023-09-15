@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
 using WaterCompanyWeb.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WaterCompanyWeb.Controllers
 {
@@ -17,17 +19,23 @@ namespace WaterCompanyWeb.Controllers
         private readonly IStaffRepository _staffRepository;
         private readonly IUserHelper _userHelper;
         private readonly IImageHelper _imageHelper;
+        private readonly DataContext _context;
         private readonly IConverterHelper _converterHelper;
+        private readonly UserManager<User> _userManager;
 
         public StaffsController(IStaffRepository staffRepository,
             IUserHelper userHelper,
             IImageHelper imageHelper,
-            IConverterHelper converterHelper)
+            DataContext context,
+            IConverterHelper converterHelper,
+            UserManager<User> userManager)
         {
             _staffRepository = staffRepository;
             _userHelper = userHelper;
             _imageHelper = imageHelper;
+            _context = context;
             _converterHelper = converterHelper;
+            _userManager = userManager;
         }
 
         // GET: Staffs
@@ -66,7 +74,6 @@ namespace WaterCompanyWeb.Controllers
             {
                 return new NotFoundViewResult("StaffNotFound");
             }
-
             var model = _converterHelper.ToStaffViewModel(staff);
             return View(model);
         }
@@ -89,15 +96,18 @@ namespace WaterCompanyWeb.Controllers
                         path = await _imageHelper.UploadImageAsync(model.ImageFile, "staffs");
                     }
 
-                    var employee = _converterHelper.ToStaff(model, path, false);
-                    employee.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
-                    await _staffRepository.UpdateAsync(employee);
+                    var staff = _converterHelper.ToStaff(model, path, false);
+
+                    staff.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                    await _staffRepository.UpdateAsync(staff);
+
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!await _staffRepository.ExistAsync(model.Id))
                     {
-                        return NotFound();
+                        new NotFoundViewResult("StaffNotFound");
                     }
                     else
                     {
@@ -140,5 +150,7 @@ namespace WaterCompanyWeb.Controllers
         {
             return View();
         }
+
+        
     }
 }
