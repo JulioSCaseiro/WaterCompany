@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -16,7 +13,6 @@ using WaterCompanyWeb.Data;
 using WaterCompanyWeb.Data.Entities;
 using WaterCompanyWeb.Helpers;
 using WaterCompanyWeb.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WaterCompanyWeb.Controllers
 {
@@ -203,8 +199,8 @@ namespace WaterCompanyWeb.Controllers
                     }
                     else
                     {
-                            ModelState.AddModelError(string.Empty, "You cannot create an admin account.");
-                            return View(model);
+                        ModelState.AddModelError(string.Empty, "You cannot create an admin account.");
+                        return View(model);
                     }
                 }
 
@@ -251,7 +247,7 @@ namespace WaterCompanyWeb.Controllers
                 Response response = _mailHelper.SendEmail("watercompanyjulio@gmail.com", "Account Register Request", $"<h1>Account Register Request</h1>" +
                     $"</br></br>             New request from a client to create an account with the following information:" +
                     $"</br></br>             First Name: {model.FirstName}," +
-                    $"</br></br>             Last Name: {model.LastName}, "+
+                    $"</br></br>             Last Name: {model.LastName}, " +
                     $"</br></br>             Phone number: {model.PhoneNumber}," +
                     $"</br></br>             Username: {model.Username}," +
                     $"</br></br>             Email: {model.Email}," +
@@ -270,12 +266,12 @@ namespace WaterCompanyWeb.Controllers
 
             return View(model);
         }
-        
+
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
             var model = new ChangeUserViewModel();
-            
+
             if (user != null)
             {
                 model.FirstName = user.FirstName;
@@ -284,8 +280,8 @@ namespace WaterCompanyWeb.Controllers
                 model.Address = user.Address;
                 model.NIF = user.NIF;
                 model.ImageUrl = user.ImageUrl;
+                model.ZIPCode = user.ZIPCode;
             }
-
             model = _converterHelper.ToUserViewModel(user);
             return View(model);
         }
@@ -316,15 +312,47 @@ namespace WaterCompanyWeb.Controllers
                     }
 
                     // Update user properties
+                    user.Id = model.Id;
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
                     user.PhoneNumber = model.PhoneNumber;
                     user.Address = model.Address;
                     user.NIF = model.NIF;
                     user.ImageUrl = path;
+                    user.ZIPCode = model.ZIPCode;
+
 
                     // Update user data store
                     var response = await _userHelper.UpdateUserAsync(user);
+
+                    //CHECK IF IT'S CLIENT OR STAFF
+                    if (isInRole)
+                    {
+                        var client = await _clientRepository.GetClientByEmailAsync(this.User.Identity.Name);
+                        //UPDATES CLIENT INFO ASWELL
+                        client.FirstName = model.FirstName;
+                        client.LastName = model.LastName;
+                        client.PhoneNumber = model.PhoneNumber;
+                        client.Address = model.Address;
+                        client.NIF = model.NIF;
+                        client.ImageUrl = path;
+                        client.ZIPCode = model.ZIPCode;
+                        await _clientRepository.UpdateAsync(client);
+                    }
+                    else
+                    {
+                        var staff = await _staffRepository.GetStaffByEmailAsync(this.User.Identity.Name);
+                        //UPDATES STAFF INFO ASWELL
+                        staff.FirstName = model.FirstName;
+                        staff.LastName = model.LastName;
+                        staff.PhoneNumber = model.PhoneNumber;
+                        staff.Address = model.Address;
+                        staff.NIF = model.NIF;
+                        staff.ImageUrl = path;
+                        staff.ZIPCode = model.ZIPCode;
+                        staff.Email = this.User.Identity.Name;
+                        await _staffRepository.UpdateAsync(staff);
+                    }
                     if (response.Succeeded)
                     {
                         ViewBag.UserMessage = "User updated successfully";

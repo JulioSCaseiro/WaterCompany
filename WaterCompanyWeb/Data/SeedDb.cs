@@ -63,13 +63,13 @@ namespace WaterCompanyWeb.Data
             }
 
 
-            if (!_context.Clients.Any())
-            {
-                AddClient("Jorge", "Manuel", user);
-                AddClient("Pedro", "Teixeira",user);
-                AddClient("Eduardo", "Fonseca", user);
-                await _context.SaveChangesAsync();
-            }
+            //if (!_context.Clients.Any())
+            //{
+            //    AddClient("Jorge", "Manuel", user);
+            //    AddClient("Pedro", "Teixeira",user);
+            //    AddClient("Eduardo", "Fonseca", user);
+            //    await _context.SaveChangesAsync();
+            //}
         }
 
         private void AddClient(string firstName, string lastName, User user)
@@ -85,7 +85,7 @@ namespace WaterCompanyWeb.Data
                 Email = "esteemailetop@gmail.com",
                 IsAvailable = true,
                 User = user
-            }) ;
+            });
         }
     }
 }
