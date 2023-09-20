@@ -14,6 +14,8 @@ namespace WaterCompanyWeb.Data
 
         public DbSet<Invoice> Invoices { get; set; }
 
+        public DbSet<Contact> Contacts { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     }
 }
